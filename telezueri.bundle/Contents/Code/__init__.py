@@ -73,8 +73,11 @@ def VideoMainMenu():
     #  http://dev.plexapp.com/docs/Objects.html#function-objects
 
     serverlist = XML.ElementFromURL(TELE_ZUERI_SERVERLIST_URL, cacheTime=300)
-    number_servers = int(serverlist.xpath('//array')[0].get('length'))
     servers = serverlist.xpath('//var[@name="url"]/string')
+    for server in servers:
+        result = HTTP.Request(server.text)
+        if not result:
+            servers.remove(server)
 
     videolist = XML.ElementFromURL(TELE_ZUERI_VIDEOLIST_URL, cacheTime=120)
 
@@ -82,7 +85,7 @@ def VideoMainMenu():
     for show in shows:
         title = show.xpath('var[@name="title"]/string')[0].text
         ident = show.xpath('var[@name="id"]/number')[0].text
-        dir.Append(Function(DirectoryItem(ShowMenu,title), server=servers[(randint(0, number_servers - 1))].text, ident=ident))
+        dir.Append(Function(DirectoryItem(ShowMenu,title), server=servers[(randint(0, len(servers) - 1))].text, ident=ident))
 
     return dir
 
