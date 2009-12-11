@@ -2,12 +2,14 @@
 from PMS import *
 from PMS.Objects import *
 from PMS.Shortcuts import *
+from random import randint
 
 ####################################################################################################
 
 VIDEO_PREFIX = "/video/telezueri"
 TELE_ZUERI_VIDEOLIST_URL = "http://www.20min.ch/rss/videoplaylist_platform.tmpl?pf=tz"
 TELE_ZUERI_DETAILS_URL = "http://www.20min.ch/telezueri/refresh.tmpl"
+TELE_ZUERI_SERVERLIST_URL = "http://server072.20min-tv.ch/lb_20min/servers.xml?899"
 
 NAME = L('Title')
 
@@ -70,17 +72,21 @@ def VideoMainMenu():
     #  http://dev.plexapp.com/docs/Objects.html#DirectoryItem
     #  http://dev.plexapp.com/docs/Objects.html#function-objects
 
+    serverlist = XML.ElementFromURL(TELE_ZUERI_SERVERLIST_URL, cacheTime=300)
+    number_servers = int(serverlist.xpath('//array')[0].get('length'))
+    servers = serverlist.xpath('//var[@name="url"]/string')
+
     videolist = XML.ElementFromURL(TELE_ZUERI_VIDEOLIST_URL, cacheTime=120)
 
     shows = videolist.xpath('//data/struct/var/array/*')
     for show in shows:
         title = show.xpath('var[@name="title"]/string')[0].text
         ident = show.xpath('var[@name="id"]/number')[0].text
-        dir.Append(Function(DirectoryItem(ShowMenu,title), ident=ident))
+        dir.Append(Function(DirectoryItem(ShowMenu,title), server=servers[(randint(0, number_servers - 1))].text, ident=ident))
 
     return dir
 
-def ShowMenu(sender, ident, start=0):
+def ShowMenu(sender, ident, server, start=0):
     dir = MediaContainer(viewGroup="InfoList")
     show_count = 0
 
@@ -88,7 +94,7 @@ def ShowMenu(sender, ident, start=0):
     show = videolist.xpath('//data/struct/var/array/struct[var/number = ' + ident + ']/var/array/*')
     for episode in show[start:]:
         if show_count == 8:
-            dir.Append(Function(DirectoryItem(ShowMenu, L("More Results")), ident=ident, start=(start + show_count)))
+            dir.Append(Function(DirectoryItem(ShowMenu, L("More Results")), server=server, ident=ident, start=(start + show_count)))
             break
         show_count += 1
 
@@ -99,6 +105,6 @@ def ShowMenu(sender, ident, start=0):
 
         summary = "\n".join(details.xpath('span[@class="text"]/text()'))
 
-        dir.Append(VideoItem("http://server774.20min-tv.ch/videos/" + episode_id + "m.flv", title=title, summary=summary))
+        dir.Append(VideoItem(server + episode_id + "m.flv", title=title, summary=summary))
 
     return dir
