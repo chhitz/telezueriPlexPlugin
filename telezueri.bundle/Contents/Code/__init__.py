@@ -79,13 +79,16 @@ def VideoMainMenu():
     return dir
 
 def ShowMenu(sender, ident):
+    dir = MediaContainer(viewGroup="InfoList")
 
-    ## you might want to try making me return a MediaContainer
-    ## containing a list of DirectoryItems to see what happens =)
+    videolist = XML.ElementFromURL("http://www.20min.ch/rss/videoplaylist_platform.tmpl?pf=tz", cacheTime=120)
+    show = videolist.xpath('//data/struct/var/array/struct[var/number = ' + ident + ']/var/array/*')
+    Log(show)
+    for episode in show:
+        title = episode.xpath('var[@name="title"]/string')[0].text
+        Log(title)
+        episode_id = episode.xpath('var[@name="id"]/number')[0].text
+        Log(episode_id)
+        dir.Append(VideoItem("http://server774.20min-tv.ch/videos/" + episode_id + "m.flv", title=title))
 
-    return MessageContainer(
-        "Not implemented",
-        "In real life, you'll make more than one callback,\nand you'll do something useful.\nsender.itemTitle=%s" % sender.itemTitle
-    )
-
-  
+    return dir
