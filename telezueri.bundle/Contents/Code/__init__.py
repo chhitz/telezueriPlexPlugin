@@ -67,24 +67,18 @@ def VideoMainMenu():
     # see:
     #  http://dev.plexapp.com/docs/Objects.html#DirectoryItem
     #  http://dev.plexapp.com/docs/Objects.html#function-objects
-    dir.Append(
-        Function(
-            DirectoryItem(
-                CallbackExample,
-                "directory item title",
-                subtitle="subtitle",
-                summary="clicking on me will call CallbackExample",
-                thumb=R(ICON),
-                art=R(ART)
-            )
-        )
-    )
 
+    videolist = XML.ElementFromURL("http://www.20min.ch/rss/videoplaylist_platform.tmpl?pf=tz", cacheTime=120)
 
-    # ... and then return the container
+    shows = videolist.xpath('//data/struct/var/array/*')
+    for show in shows:
+        title = show.xpath('var[@name="title"]/string')[0].text
+        ident = show.xpath('var[@name="id"]/number')[0].text
+        dir.Append(Function(DirectoryItem(ShowMenu,title), ident=ident))
+
     return dir
 
-def CallbackExample(sender):
+def ShowMenu(sender, ident):
 
     ## you might want to try making me return a MediaContainer
     ## containing a list of DirectoryItems to see what happens =)
