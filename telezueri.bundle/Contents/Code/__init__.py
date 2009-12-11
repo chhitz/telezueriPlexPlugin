@@ -86,9 +86,12 @@ def ShowMenu(sender, ident):
     Log(show)
     for episode in show:
         title = episode.xpath('var[@name="title"]/string')[0].text
-        Log(title)
         episode_id = episode.xpath('var[@name="id"]/number')[0].text
-        Log(episode_id)
-        dir.Append(VideoItem("http://server774.20min-tv.ch/videos/" + episode_id + "m.flv", title=title))
+
+        details = XML.ElementFromURL("http://www.20min.ch/telezueri/refresh.tmpl", values={"channel_id": ident, "video_id": episode_id, "page": 0}, isHTML=True)
+
+        summary = "\n".join(details.xpath('span[@class="text"]/text()'))
+
+        dir.Append(VideoItem("http://server774.20min-tv.ch/videos/" + episode_id + "m.flv", title=title, summary=summary))
 
     return dir
