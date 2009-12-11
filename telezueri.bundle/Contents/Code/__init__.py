@@ -6,6 +6,8 @@ from PMS.Shortcuts import *
 ####################################################################################################
 
 VIDEO_PREFIX = "/video/telezueri"
+TELE_ZUERI_VIDEOLIST_URL = "http://www.20min.ch/rss/videoplaylist_platform.tmpl?pf=tz"
+TELE_ZUERI_DETAILS_URL = "http://www.20min.ch/telezueri/refresh.tmpl"
 
 NAME = L('Title')
 
@@ -68,7 +70,7 @@ def VideoMainMenu():
     #  http://dev.plexapp.com/docs/Objects.html#DirectoryItem
     #  http://dev.plexapp.com/docs/Objects.html#function-objects
 
-    videolist = XML.ElementFromURL("http://www.20min.ch/rss/videoplaylist_platform.tmpl?pf=tz", cacheTime=120)
+    videolist = XML.ElementFromURL(TELE_ZUERI_VIDEOLIST_URL, cacheTime=120)
 
     shows = videolist.xpath('//data/struct/var/array/*')
     for show in shows:
@@ -82,7 +84,7 @@ def ShowMenu(sender, ident, start=0):
     dir = MediaContainer(viewGroup="InfoList")
     show_count = 0
 
-    videolist = XML.ElementFromURL("http://www.20min.ch/rss/videoplaylist_platform.tmpl?pf=tz", cacheTime=120)
+    videolist = XML.ElementFromURL(TELE_ZUERI_VIDEOLIST_URL, cacheTime=120)
     show = videolist.xpath('//data/struct/var/array/struct[var/number = ' + ident + ']/var/array/*')
     for episode in show[start:]:
         if show_count == 8:
@@ -93,7 +95,7 @@ def ShowMenu(sender, ident, start=0):
         title = episode.xpath('var[@name="title"]/string')[0].text
         episode_id = episode.xpath('var[@name="id"]/number')[0].text
 
-        details = XML.ElementFromURL("http://www.20min.ch/telezueri/refresh.tmpl", values={"channel_id": ident, "video_id": episode_id, "page": 0}, isHTML=True)
+        details = XML.ElementFromURL(TELE_ZUERI_DETAILS_URL, values={"channel_id": ident, "video_id": episode_id, "page": 0}, isHTML=True)
 
         summary = "\n".join(details.xpath('span[@class="text"]/text()'))
 
