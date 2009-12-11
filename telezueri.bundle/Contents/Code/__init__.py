@@ -78,13 +78,18 @@ def VideoMainMenu():
 
     return dir
 
-def ShowMenu(sender, ident):
+def ShowMenu(sender, ident, start=0):
     dir = MediaContainer(viewGroup="InfoList")
+    show_count = 0
 
     videolist = XML.ElementFromURL("http://www.20min.ch/rss/videoplaylist_platform.tmpl?pf=tz", cacheTime=120)
     show = videolist.xpath('//data/struct/var/array/struct[var/number = ' + ident + ']/var/array/*')
-    Log(show)
-    for episode in show:
+    for episode in show[start:]:
+        if show_count == 8:
+            dir.Append(Function(DirectoryItem(ShowMenu, L("More Results")), ident=ident, start=(start + show_count)))
+            break
+        show_count += 1
+
         title = episode.xpath('var[@name="title"]/string')[0].text
         episode_id = episode.xpath('var[@name="id"]/number')[0].text
 
