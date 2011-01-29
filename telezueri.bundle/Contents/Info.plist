@@ -9,7 +9,7 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>PlexFrameworkVersion</key>
-    <string>1</string>
+    <string>2</string>
     <key>CFBundlePackageType</key>
     <string>AAPL</string>
     <key>CFBundleSignature</key>
@@ -18,7 +18,9 @@
     <string>1.0</string>
     <key>PlexPluginMode</key>
     <string>AlwaysOn</string>
-    <key>PlexPluginDebug</key>
+    <key>PlexPluginConsoleLogging</key>
     <string>1</string>
+    <key>PlexClientPlatforms</key>
+    <string>MacOSX</string>
   </dict>
 </plist>
