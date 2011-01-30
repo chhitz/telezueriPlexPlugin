@@ -28,10 +28,8 @@ def VideoMainMenu():
     dir = MediaContainer(viewGroup="InfoList")
 
     serverlist = HTML.ElementFromURL(TELE_ZUERI_SERVERLIST_URL, cacheTime=300)
-    Log(XML.StringFromElement(serverlist))
     servers = serverlist.xpath('//var[@name="url"]/string')
     for server in servers:
-        Log(server.text)
         try:
             result = HTTP.Request(server.text)
         except:
